@@ -1107,6 +1107,43 @@ API_KEY=web_api_key_xyz
 	_, err = executeCommand("push", "--key=APP_SECRET", fmt.Sprintf("--from=%s", sourceEnv), fmt.Sprintf("--to=%s", sourceEnv))
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "source file and target file cannot be the same")
+
+	// 9. Relative monorepo paths like ../web/.env.local
+	cmsDir := filepath.Join(tempDir, "cms_app")
+	webDir := filepath.Join(tempDir, "web_app")
+	require.NoError(t, os.MkdirAll(cmsDir, 0755))
+	require.NoError(t, os.MkdirAll(webDir, 0755))
+
+	cmsEnv := filepath.Join(cmsDir, ".env")
+	webLocalEnv := filepath.Join(webDir, ".env.local")
+	require.NoError(t, os.WriteFile(cmsEnv, []byte("REFRESH_TOKEN=cms_refresh_token_999\nAUTH_SECRET=auth_sec_abc\n"), 0644))
+
+	origWd, err := os.Getwd()
+	require.NoError(t, err)
+	defer os.Chdir(origWd)
+
+	require.NoError(t, os.Chdir(cmsDir))
+
+	// Test pushing from .env to ../web_app/.env.local
+	out, err = executeCommand("push", "--key=REFRESH_TOKEN", "--from=.env", "--to=../web_app/.env.local")
+	require.NoError(t, err, "out=%s", out)
+	assert.Contains(t, out, "REFRESH_TOKEN")
+
+	content, err = os.ReadFile(webLocalEnv)
+	require.NoError(t, err)
+	assert.Contains(t, string(content), `REFRESH_TOKEN="cms_refresh_token_999"`)
+
+	// Test pushing with positional target and dynamic flag: gotenv push ../web_app/.env.local --from=.env --auth-secret
+	out, err = executeCommand("push", "../web_app/.env.local", "--from=.env", "--auth-secret")
+	require.NoError(t, err, "out=%s", out)
+	assert.Contains(t, out, "AUTH_SECRET")
+
+	content, err = os.ReadFile(webLocalEnv)
+	require.NoError(t, err)
+	assert.Contains(t, string(content), `AUTH_SECRET="auth_sec_abc"`)
+
+	// Restore working directory before test completion
+	_ = os.Chdir(origWd)
 }
 
 func TestCLISkillCommand(t *testing.T) {
