@@ -7,7 +7,7 @@ This project uses [GoReleaser](https://goreleaser.com/) and GitHub Actions to au
 When you are ready to publish a new version of `gotenv`, follow these steps:
 
 1. **Commit your changes**
-   Ensure all your changes are committed and pushed to the `main` branch.
+   Make sure that you commit and push all changes to the `main` branch.
 
 2. **Tag the release**
    Create a new Git tag using semantic versioning (e.g., `v1.0.0`). The `v` prefix is required by the workflow.
@@ -33,7 +33,7 @@ Once the tag is pushed to GitHub, the `.github/workflows/release.yml` GitHub Act
 
 ## Homebrew Tap Setup (One-Time Configuration)
 
-If you want GoReleaser to automatically push the Homebrew formula to a separate tap repository (e.g., `adampatterson/homebrew-tap`), you must complete this one-time setup:
+To push the Homebrew formula to a tap repository, complete this one-time setup:
 
 1. Create a public repository on GitHub named `homebrew-tap` under your account.
 2. Generate a [GitHub Personal Access Token (PAT)](https://github.com/settings/tokens) with `repo` scope.

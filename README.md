@@ -1,12 +1,12 @@
 # gotenv
 
-A fast and friendly CLI tool written in Go using [Cobra](https://github.com/spf13/cobra) to inspect, get, set, push (sync), list, and delete environment variables in `.env` files, inspired by DDEV's `dotenv` command.
+A Go CLI tool to inspect, set, sync, list, and delete environment variables in `.env` files.
 
 ## Features
 
-- **Dynamic Flag Mapping**: Pass arbitrary long flags (e.g. `--app-key=value` or `--statamic-license-key=secret`) which are automatically converted to uppercase environment variable keys (`APP_KEY="value"`, `STATAMIC_LICENSE_KEY="secret"`).
+- **Dynamic Flag Mapping**: Pass arbitrary long flags (e.g. `--app-key=value` or `--statamic-license-key=secret`) which convert to uppercase environment variable keys (`APP_KEY="value"`, `STATAMIC_LICENSE_KEY="secret"`).
 - **Structure & Comment Preservation**: Updates existing variables in place without wiping comments or disrupting existing formatting.
-- **Safe Escaping**: Automatically escapes double quotes (`\"`) and shell dollar signs (`\$`) when writing values.
+- **Safe Escaping**: Escapes double quotes (`\"`) and shell dollar signs (`\$`) when writing values.
 - **Multiple Environment Files**: Works with `.env`, `.env.local`, `.env.*` (e.g. `.ddev/.env.redis`).
 - **DDEV-Compatible Subcommands**: Supports both `gotenv get ...` and `gotenv dotenv get ...` syntax.
 - **List & JSON Export**: List variables formatted for shell sourcing (`--export`) or structured JSON (`--json`).
@@ -19,6 +19,10 @@ A fast and friendly CLI tool written in Go using [Cobra](https://github.com/spf1
 brew install adampatterson/tap/gotenv
 ```
 
+### Pre-built Binaries
+
+Download pre-compiled binaries for macOS, Linux, and Windows from [GitHub Releases](https://github.com/adampatterson/gotenv/releases).
+
 ### From Source
 
 ```bash
@@ -27,13 +31,28 @@ git clone https://github.com/adampatterson/gotenv.git
 cd gotenv
 
 # Build binary
-go build -o gotenv .
+make build
 
 # Or install to your Go bin directory
 go install
 ```
 
 ## Usage
+
+### Quick Start
+
+The three most common operations:
+
+```bash
+# 1. Set a variable
+gotenv set --app-name="Neon Nights"
+
+# 2. Get a variable value
+gotenv get --app-name
+
+# 3. Push a variable to another .env file
+gotenv push APP_KEY --from=.env --to=.env.local
+```
 
 ### 1. Setting Variables (`set` / `add`)
 
@@ -75,14 +94,14 @@ gotenv set .env --comment="comment value" -c "Comment for COMMENT variable"
 gotenv set .env --app-env -c "Adds a comment, but won't overwrite existing value"
 ```
 
-**Generate Secrets Automatically**: You can use the magic values `@generate` or `@random` to automatically generate random secrets:
-- For standard variables, a 16-byte random hex string is generated (equivalent to `$(openssl rand -hex 16)`):
+**Generate Secrets Automatically**: You can use the magic values `@generate` or `@random` to generate random secrets:
+- For standard variables, the tool generates a 16-byte random hex string (equivalent to `$(openssl rand -hex 16)`):
 
 ```bash
 gotenv set .env --statamic-license-key=@generate
 ```
 
-- For Laravel application keys (`--app-key=@generate` or using `@key`, `@app-key`, `@base64`), a Laravel-compatible 32-byte base64-encoded key (`base64:...`) is generated:
+- For Laravel application keys (`--app-key=@generate` or using `@key`, `@app-key`, `@base64`), the tool generates a 32-byte base64-encoded key for Laravel (`base64:...`):
 
 ```bash
 gotenv set .env --app-key=@generate
@@ -160,7 +179,7 @@ gotenv disable --app-debug
 gotenv disable --statamic-stache-watcher
 ```
 
-If the variable does not exist, it will be created. If the variable already exists with a value other than `empty`, `null`, `true`, or `false`, confirmation will be requested before overwriting (or pass `-y` / `--yes` to accept automatically).
+If the variable does not exist, the command creates it. If the variable already exists with a value other than `empty`, `null`, `true`, or `false`, the command prompts for confirmation before it overwrites values (or pass `-y` / `--yes` to accept automatically).
 
 ### 6. Removing Variables (`unset` / `rm` / `delete`)
 
@@ -203,7 +222,7 @@ gotenv dotenv set .env --statamic-pro-enabled=true
 
 ## Shell Completions
 
-`gotenv` uses [Cobra](https://github.com/spf13/cobra), which automatically provides a `completion` subcommand for generating shell completion scripts for `bash`, `zsh`, `fish`, and `powershell` — no extra installation required beyond your shell's standard configuration.
+`gotenv` uses [Cobra](https://github.com/spf13/cobra), which includes a `completion` subcommand for `bash`, `zsh`, `fish`, and `powershell`. No extra installation is required beyond standard shell configuration.
 
 **Bash**
 
@@ -240,6 +259,8 @@ gotenv completion --help
 ## Running Tests
 
 ```bash
+make test
+# or
 go test -v ./...
 ```
 
@@ -257,4 +278,4 @@ go run ./internal/tools/docgen -out ./docs/cli
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on setting up the project, running tests, and opening pull requests.
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for details on setting up the project, running tests, and opening pull requests.
