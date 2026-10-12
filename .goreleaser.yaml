@@ -1,0 +1,63 @@
+version: 2
+
+project_name: gotenv
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+brews:
+  - repository:
+      owner: adampatterson
+      name: homebrew-tap
+      # token: "{{ .Env.TAP_GITHUB_TOKEN }}" # Uncomment and use a PAT if pushing to a different repository
+
+    # Directory inside the repository to push the formula
+    directory: Formula
+
+    homepage: "https://github.com/adampatterson/gotenv"
+    description: "A fast and friendly CLI tool to inspect, get, set, list, and delete environment variables in .env files."
+    license: "MIT"
+
+    # Set to true if you don't want to create the tap right away, or let goreleaser create it
+    # skip_upload: false
+
+    test: |
+      system "#{bin}/gotenv --help"

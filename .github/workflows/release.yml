@@ -1,0 +1,39 @@
+name: release
+
+on:
+  push:
+    # Trigger the workflow on version tags
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+  issues: write
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # To push the Homebrew formula to a separate repository (like adampatterson/homebrew-tap),
+          # you need to create a Personal Access Token (PAT) with 'repo' scope, add it as a repository
+          # secret named TAP_GITHUB_TOKEN, and uncomment the line below. Also uncomment it in .goreleaser.yaml.
+          # TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
