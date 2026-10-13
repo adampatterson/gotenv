@@ -37,7 +37,16 @@ To push the Homebrew formula to a tap repository, complete this one-time setup:
 
 1. Create a public repository on GitHub named `homebrew-tap` under your account.
 2. Generate a [GitHub Personal Access Token (PAT)](https://github.com/settings/tokens) with `repo` scope.
-3. In this `gotenv` repository, navigate to **Settings > Secrets and variables > Actions** and create a new repository secret:
+3. Add the secret `TAP_GITHUB_TOKEN` to the `gotenv` repository with one of these methods:
+
+   **Option A: GitHub CLI (Fastest)**
+   ```bash
+   gh secret set TAP_GITHUB_TOKEN
+   ```
+   Paste your PAT when prompted.
+
+   **Option B: GitHub Web Interface**
+   Navigate to **Settings > Secrets and variables > Actions** and create a new repository secret:
    - **Name:** `TAP_GITHUB_TOKEN`
    - **Secret:** *(Paste your PAT here)*
 4. In `.goreleaser.yaml`, uncomment the `token` line under the `brews` section:
