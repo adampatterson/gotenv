@@ -35,3 +35,4 @@ gotenv rm [file] [flags]
 ### SEE ALSO
 
 * [gotenv](gotenv.md)	 - gotenv is a CLI tool for managing .env files
+

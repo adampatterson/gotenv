@@ -69,41 +69,61 @@ func runPushCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	if pushFromFlag == "" {
-		return fmt.Errorf("missing required source file flag --from (e.g. --from=\"web/.env.local\")")
-	}
+	var sourceFile string
+	var positionalKeys []string
+	var targetFiles []string
+	targetFiles = append(targetFiles, pushToFlags...)
 
-	sourceFile, err := ResolveEnvFilePath(pushFromFlag)
-	if err != nil {
-		return fmt.Errorf("Invalid source file: %w", err)
+	if pushFromFlag != "" {
+		resolvedSource, err := ResolveEnvFilePath(pushFromFlag)
+		if err != nil {
+			return fmt.Errorf("Invalid source file: %w", err)
+		}
+		sourceFile = resolvedSource
+
+		if len(pushToFlags) > 0 {
+			// When --to is specified explicitly, all positional args are keys
+			positionalKeys = append(positionalKeys, filteredArgs...)
+		} else {
+			// When --to is not specified, check if any positional arg is an env file path
+			targetFound := false
+			for _, arg := range filteredArgs {
+				if !targetFound && isEnvPath(arg) {
+					targetFiles = append(targetFiles, arg)
+					targetFound = true
+				} else {
+					positionalKeys = append(positionalKeys, arg)
+				}
+			}
+			if !targetFound {
+				targetFiles = append(targetFiles, ".env")
+			}
+		}
+	} else if len(pushToFlags) > 0 {
+		// When --to is specified but --from is not, look for source file in positional args
+		sourceFound := false
+		for _, arg := range filteredArgs {
+			if !sourceFound && isEnvPath(arg) {
+				resolvedSource, err := ResolveEnvFilePath(arg)
+				if err != nil {
+					return fmt.Errorf("Invalid source file: %w", err)
+				}
+				sourceFile = resolvedSource
+				sourceFound = true
+			} else {
+				positionalKeys = append(positionalKeys, arg)
+			}
+		}
+		if !sourceFound {
+			return fmt.Errorf("missing required source file flag --from (e.g. --from=\"web/.env.local\")")
+		}
+	} else {
+		return fmt.Errorf("missing required source file flag --from (e.g. --from=\"web/.env.local\")")
 	}
 
 	sourceMap, sourceText, err := gotenv.ReadEnvFile(sourceFile)
 	if err != nil {
 		return fmt.Errorf("Unable to read source file %s: %w", sourceFile, err)
-	}
-
-	var positionalKeys []string
-	var targetFiles []string
-	targetFiles = append(targetFiles, pushToFlags...)
-
-	if len(pushToFlags) > 0 {
-		// When --to is specified explicitly, all positional args are keys
-		positionalKeys = append(positionalKeys, filteredArgs...)
-	} else {
-		// When --to is not specified, check if any positional arg is an env file path
-		targetFound := false
-		for _, arg := range filteredArgs {
-			if !targetFound && isEnvPath(arg) {
-				targetFiles = append(targetFiles, arg)
-				targetFound = true
-			} else {
-				positionalKeys = append(positionalKeys, arg)
-			}
-		}
-		if !targetFound {
-			targetFiles = append(targetFiles, ".env")
-		}
 	}
 
 	targetFiles = append(targetFiles, pushAndFlags...)
@@ -268,6 +288,7 @@ To push all variables present in the source file, use the --all (or -a) flag.
 
 Paths are evaluated relative to the current working directory (PWD).`,
 	Example: `  godot push --key=APP_KEY --from=web/.env.local --to=.env
+  godot push .env --to=../web/.env.local --refresh-token
   godot push APP_KEY --from=web/.env.local --to=.env
   godot push APP_KEY --from=web/.env.local --to=.env --and=api/.env
   godot push --from=web/.env.local --to=.env --all

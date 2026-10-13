@@ -20,6 +20,7 @@ gotenv push [key...] [file] [flags]
 
 ```
   godot push --key=APP_KEY --from=web/.env.local --to=.env
+  godot push .env --to=../web/.env.local --refresh-token
   godot push APP_KEY --from=web/.env.local --to=.env
   godot push APP_KEY --from=web/.env.local --to=.env --and=api/.env
   godot push --from=web/.env.local --to=.env --all
@@ -50,3 +51,4 @@ gotenv push [key...] [file] [flags]
 ### SEE ALSO
 
 * [gotenv](gotenv.md)	 - gotenv is a CLI tool for managing .env files
+

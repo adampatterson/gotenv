@@ -54,6 +54,26 @@ gotenv get --app-name
 gotenv push APP_KEY --from=.env --to=.env.local
 ```
 
+### Mental Model: Data Flow
+
+`gotenv` uses two data flow patterns:
+
+- **Single-file commands (`set`, `get`, `rm`, `enable`, `disable`)**:
+  `action -> target_file -> variables`
+  The positional file argument is the file that you read or change.
+  ```bash
+  gotenv set .env --app-key=secret
+  gotenv get .env --app-key
+  ```
+
+- **Transfer commands (`push`)**:
+  `action -> source_file -> target_file -> variables`
+  Data moves from a source file to one or more target files.
+  ```bash
+  gotenv push .env --to=web/.env.local --app-key
+  gotenv push APP_KEY --from=.env --to=web/.env.local
+  ```
+
 ### 1. Setting Variables (`set` / `add`)
 
 Create or update variables in a `.env` file using flags:
@@ -126,6 +146,11 @@ gotenv push DB_HOST DB_PORT --from=web/.env.local --to=.env -c "Synced from web"
 
 # Push all variables from source file to target
 gotenv push --from=web/.env.local --to=cms/.env --all
+
+# Monorepo sync (e.g. pushing tokens across sibling packages)
+gotenv push .env --to=../web/.env.local --refresh-token
+gotenv push REFRESH_TOKEN --from=.env --to=../web/.env.local
+gotenv push ../web/.env.local --from=.env --refresh-token
 ```
 
 > **Path Best Practice**: All file paths are resolved relative to your current working directory (PWD). Both clean relative paths (e.g. `web/.env.local`) and `./` prefixes (e.g. `./web/.env.local`) are fully supported and normalized automatically.

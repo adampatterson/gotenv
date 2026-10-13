@@ -1142,6 +1142,26 @@ API_KEY=web_api_key_xyz
 	require.NoError(t, err)
 	assert.Contains(t, string(content), `AUTH_SECRET="auth_sec_abc"`)
 
+	// 10. Push with positional source and --to flag: gotenv push .env --to=../web_app/.env.local --auth-secret
+	out, err = executeCommand("push", ".env", "--to=../web_app/.env.local", "--auth-secret")
+	require.NoError(t, err, "out=%s", out)
+	assert.Contains(t, out, "AUTH_SECRET")
+
+	// 11. Test exact issue syntax: gotenv push ./test/.env --to=./test/web/.env.local --app-key
+	testEnv := filepath.Join(tempDir, "test_app", ".env")
+	testWebEnv := filepath.Join(tempDir, "test_app", "web", ".env.local")
+	require.NoError(t, os.MkdirAll(filepath.Dir(testWebEnv), 0755))
+	require.NoError(t, os.WriteFile(testEnv, []byte("# App Key\nAPP_KEY=\"base64:9rxE0jc3gB9FsZwl927BifU28QJvzEn9mqy2wqIleSI=\"\n"), 0644))
+
+	out, err = executeCommand("push", testEnv, fmt.Sprintf("--to=%s", testWebEnv), "--app-key")
+	require.NoError(t, err, "out=%s", out)
+	assert.Contains(t, out, "APP_KEY")
+
+	content, err = os.ReadFile(testWebEnv)
+	require.NoError(t, err)
+	assert.Contains(t, string(content), `APP_KEY="base64:9rxE0jc3gB9FsZwl927BifU28QJvzEn9mqy2wqIleSI="`)
+	assert.Contains(t, string(content), "# App Key")
+
 	// Restore working directory before test completion
 	_ = os.Chdir(origWd)
 }
