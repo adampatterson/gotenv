@@ -324,3 +324,9 @@ go run ./internal/tools/docgen -out ./docs/cli
 ## Contributing
 
 Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for details on setting up the project, running tests, and opening pull requests.
+
+## Note on Raw Output & Security
+
+`gotenv` is designed for managing and inspecting local environment files (`.env`), operating directly on local files that the developer already has filesystem permissions to read. Like standard POSIX utilities (`env`, `printenv`) and other dotenv CLI tools, `gotenv` outputs raw values verbatim without masking to prioritize operational transparency, scriptability (e.g. `--export`, shell evaluation), and straightforward local debugging. 
+
+Unlike dedicated secret management platforms (such as HashiCorp Vault, 1Password CLI, or AWS Secrets Manager) which mask or redact secret values by default, `gotenv` treats all `.env` entries uniformly. Users should exercise standard caution when sharing screens, recording demos, or piping command output in shared or CI environments.
