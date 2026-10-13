@@ -36,4 +36,4 @@ jobs:
           # To push the Homebrew formula to a separate repository (like adampatterson/homebrew-tap),
           # you need to create a Personal Access Token (PAT) with 'repo' scope, add it as a repository
           # secret named TAP_GITHUB_TOKEN, and uncomment the line below. Also uncomment it in .goreleaser.yaml.
-          # TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}

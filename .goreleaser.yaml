@@ -47,7 +47,7 @@ brews:
   - repository:
       owner: adampatterson
       name: homebrew-tap
-      # token: "{{ .Env.TAP_GITHUB_TOKEN }}" # Uncomment and use a PAT if pushing to a different repository
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}" # Uncomment and use a PAT if pushing to a different repository
 
     # Directory inside the repository to push the formula
     directory: Formula
