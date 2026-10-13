@@ -23,6 +23,26 @@ brew install adampatterson/tap/gotenv
 
 Download pre-compiled binaries for macOS, Linux, and Windows from [GitHub Releases](https://github.com/adampatterson/gotenv/releases).
 
+#### macOS Security Notice
+
+If macOS blocks the binary from opening, use one of these options:
+
+##### Option 1: Terminal Command
+
+Remove quarantine attributes:
+
+```bash
+chmod +x gotenv
+xattr -cr gotenv
+```
+
+##### Option 2: macOS System Settings
+
+1. Run `./gotenv` in your terminal to trigger the system prompt.
+2. Open **System Settings** > **Privacy & Security**.
+3. Scroll to the **Security** section.
+4. Click **Open Anyway** next to the `gotenv` notice and confirm.
+
 ### From Source
 
 ```bash
