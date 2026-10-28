@@ -54,8 +54,33 @@ cd gotenv
 make build
 
 # Or install to your Go bin directory
-go install
+go install .
 ```
+
+#### macOS
+
+Use `go install` to make `gotenv` run from any directory. Go must be installed (`brew install go`).
+
+1. From the repository root, run `go install .`
+2. Make sure `~/go/bin` is in your `PATH`. If it is not, run:
+
+   ```bash
+   echo 'export PATH="$PATH:$HOME/go/bin"' >> ~/.zshrc
+   source ~/.zshrc
+   ```
+
+3. Check the install: `which gotenv && gotenv --help`
+
+`go install` puts the binary in `$GOBIN`. If `GOBIN` is not set, it uses `$GOPATH/bin`, which is `~/go/bin` by default. Run `go env GOBIN GOPATH` to see your paths.
+
+To skip the `PATH` change, build the binary and copy it to a directory that is already in your `PATH`:
+
+```bash
+make build
+sudo mv gotenv /usr/local/bin/
+```
+
+This copies the binary. Run these two commands again after each rebuild.
 
 ## Usage
 
