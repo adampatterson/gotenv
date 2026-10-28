@@ -42,6 +42,11 @@ func ExtractCommentFromArgs(args []string) ([]string, string) {
 
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
+		// Everything after a bare "--" is a command for `run` and must reach it untouched.
+		if arg == "--" {
+			cleanArgs = append(cleanArgs, args[i:]...)
+			break
+		}
 		lower := strings.ToLower(arg)
 		if strings.HasPrefix(lower, "comment=") {
 			val := arg[8:]

@@ -29,6 +29,7 @@ gotenv [flags]
 * [gotenv list](gotenv_list.md)	 - List all environment variables in a .env file
 * [gotenv push](gotenv_push.md)	 - Push environment variable values from one .env file to another
 * [gotenv rm](gotenv_rm.md)	 - Delete variables entirely from a .env file
+* [gotenv run](gotenv_run.md)	 - Run a command with the variables from .env files in its environment
 * [gotenv set](gotenv_set.md)	 - Write values from the command line to a .env file
 * [gotenv skill](gotenv_skill.md)	 - Generate a SKILL.md file for AI agent integrations
 * [gotenv unset](gotenv_unset.md)	 - Blank the value of variables in a .env file

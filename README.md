@@ -10,6 +10,7 @@ A Go CLI tool to inspect, set, sync, list, and delete environment variables in `
 - **Multiple Environment Files**: Works with `.env`, `.env.local`, `.env.*` (e.g. `.ddev/.env.redis`).
 - **DDEV-Compatible Subcommands**: Supports both `gotenv get ...` and `gotenv dotenv get ...` syntax.
 - **List & JSON Export**: List variables formatted for shell sourcing (`--export`) or structured JSON (`--json`).
+- **Run With Variables**: Run a command with the variables from `.env` files in its environment (`gotenv run -- cmd`).
 
 ## Installation
 
@@ -281,7 +282,25 @@ gotenv skill -out ~/PATH_NAME/
 gotenv skill --out ./docs/
 ```
 
-### 8. DDEV Compatibility
+### 8. Running a Command with Variables (`run`)
+
+Run any command with the variables from one or more `.env` files in its environment, like `op run --env-file`:
+
+```bash
+# Load .env (the default) and run a command
+gotenv run -- ddev k6 run
+
+# Load specific files, later files override earlier ones
+gotenv run --env-file=.env --env-file=.env.local -- npm test
+```
+
+- Values from the files override variables that are already set in your shell.
+- The files are only read. Nothing is written to them or exported to your shell.
+- The command keeps stdin, stdout, and stderr. `gotenv` exits with the command's exit code (`128` plus the signal number if a signal ended it) and forwards `SIGINT` and `SIGTERM` to it.
+- The `--` is optional unless the command starts with a `-`. Flags after the command go to the command.
+- Variables reach processes on your machine only. `ddev` does not copy them into the container, so use `web_environment` or `ddev exec -e` for commands that run inside DDEV.
+
+### 9. DDEV Compatibility
 
 You can also run all commands with the `dotenv` prefix matching DDEV CLI syntax:
 

@@ -35,6 +35,7 @@ Use ` + "`gotenv`" + ` when you need to:
 - List or export variables in plain, bash ` + "`export`" + `, or JSON format.
 - Push / sync variables between different environment files (e.g. ` + "`.env.example`" + ` to ` + "`.env`" + `).
 - Blank out (` + "`unset`" + `) or completely remove (` + "`rm`" + ` / ` + "`delete`" + `) environment variables.
+- Run a command with the variables from ` + "`.env`" + ` files in its environment (` + "`run`" + `).
 
 ---
 
@@ -174,6 +175,17 @@ Generate a ` + "`SKILL.md`" + ` file for AI agents:
 gotenv skill
 gotenv skill -out ~/skills/gotenv/
 gotenv skill --out ./docs/
+` + "```" + `
+
+---
+
+### 9. Running a Command with Variables (` + "`run`" + `)
+
+Run a command with the variables from ` + "`.env`" + ` files added to its environment. File values override variables already set, and later ` + "`--env-file`" + ` flags override earlier ones. The default file is ` + "`.env`" + `. The exit code of the command is passed through.
+
+` + "```bash" + `
+gotenv run -- ddev k6 run
+gotenv run --env-file=.env --env-file=.env.local -- npm test
 ` + "```" + `
 `
 

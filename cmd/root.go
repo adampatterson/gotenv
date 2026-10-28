@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"errors"
+	"io"
 	"os"
 
 	"github.com/charmbracelet/fang"
@@ -13,7 +15,7 @@ var rootCmd = &cobra.Command{
 	Aliases: []string{"godot"},
 	Short:   "gotenv is a CLI tool for managing .env files",
 	Long:    `gotenv is a command line utility to inspect, get, set, push (sync), and delete variables in .env files, inspired by DDEV's dotenv command.`,
-	Version: "1.0.0",
+	Version: "1.0.1",
 	Args:    cobra.ArbitraryArgs,
 	FParseErrWhitelist: cobra.FParseErrWhitelist{
 		UnknownFlags: true,
@@ -28,6 +30,16 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+// handleError prints errors with fang's default styling, except for a child exit code from `run`,
+// which the child has already reported on its own.
+func handleError(w io.Writer, styles fang.Styles, err error) {
+	var exitErr *ExitCodeError
+	if errors.As(err, &exitErr) {
+		return
+	}
+	fang.DefaultErrorHandler(w, styles, err)
+}
+
 // Execute executes the root command.
 func Execute() {
 	cleanArgs, comment := ExtractCommentFromArgs(os.Args[1:])
@@ -35,7 +47,12 @@ func Execute() {
 		commentFlag = comment
 	}
 	rootCmd.SetArgs(cleanArgs)
-	if err := fang.Execute(context.Background(), rootCmd, fang.WithVersion(rootCmd.Version)); err != nil {
+	err := fang.Execute(context.Background(), rootCmd, fang.WithVersion(rootCmd.Version), fang.WithErrorHandler(handleError))
+	if err != nil {
+		var exitErr *ExitCodeError
+		if errors.As(err, &exitErr) {
+			os.Exit(exitErr.Code)
+		}
 		os.Exit(1)
 	}
 }
@@ -56,6 +73,7 @@ func init() {
 	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(enableCmd)
 	rootCmd.AddCommand(disableCmd)
+	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(skillCmd)
 	rootCmd.AddCommand(dotEnvCmd)
 }
