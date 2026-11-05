@@ -29,6 +29,11 @@ go.work.sum
 .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.idea/
+.vscode/
 /.env.example
+
+# Generated files
+.claude/
+.junie/
+skills/system/run-workflow/
