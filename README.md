@@ -20,6 +20,9 @@ A Go CLI tool to inspect, set, sync, list, and delete environment variables in `
 brew install adampatterson/tap/gotenv
 ```
 
+>[!NOTE]
+> Coming soon!
+
 ### Pre-built Binaries
 
 Download pre-compiled binaries for macOS, Linux, and Windows from [GitHub Releases](https://github.com/adampatterson/gotenv/releases).
